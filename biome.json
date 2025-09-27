@@ -7,7 +7,8 @@
 		"defaultBranch": "main"
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!README.md", "!src/routeTree.gen.ts", "!bun.lock"]
 	},
 	"formatter": {
 		"enabled": true,
