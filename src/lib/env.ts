@@ -2,7 +2,7 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import * as z from "zod";
 import type { Result } from "./fp";
 
-const envSchema = z.object({
+export const envSchema = z.object({
 	DATABASE_URL: z.url(),
 });
 

@@ -8,7 +8,14 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!README.md", "!src/routeTree.gen.ts", "!bun.lock"]
+		"includes": [
+			"**",
+			"!README.md",
+			"!src/routeTree.gen.ts",
+			"!bun.lock",
+			"!drizzle/meta/*.json",
+			"!drizzle/*.sql"
+		]
 	},
 	"formatter": {
 		"enabled": true,
