@@ -3,6 +3,7 @@ import {
 	foreignKey,
 	integer,
 	pgTable,
+	primaryKey,
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
@@ -20,6 +21,12 @@ export const userTable = pgTable("user", {
 
 export const userRelations = relations(userTable, ({ many }) => ({
 	tweets: many(tweetTable),
+	followingList: many(userFollowingTable, {
+		relationName: "userFollowing_user",
+	}),
+	followersList: many(userFollowingTable, {
+		relationName: "userFollowing_follower",
+	}),
 }));
 
 export const tweetTable = pgTable(
@@ -57,3 +64,34 @@ export const tweetRelations = relations(tweetTable, ({ one, many }) => ({
 	}),
 	replies: many(tweetTable),
 }));
+
+export const userFollowingTable = pgTable(
+	"user_following",
+	{
+		user_id: integer()
+			.notNull()
+			.references(() => userTable.id),
+		following_user_id: integer()
+			.notNull()
+			.references(() => userTable.id),
+	},
+	(table) => [
+		primaryKey({ columns: [table.user_id, table.following_user_id] }),
+	],
+);
+
+export const userFollowingRelations = relations(
+	userFollowingTable,
+	({ one }) => ({
+		user: one(userTable, {
+			fields: [userFollowingTable.user_id],
+			references: [userTable.id],
+			relationName: "userFollowing_user",
+		}),
+		follower: one(userTable, {
+			fields: [userFollowingTable.following_user_id],
+			references: [userTable.id],
+			relationName: "userFollowing_follower",
+		}),
+	}),
+);

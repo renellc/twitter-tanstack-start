@@ -67,8 +67,18 @@ function RouteComponent() {
 		<div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
 			<span>Hello {user.username}!</span>
 			<span>Bio: {user.bio}</span>
-			<span>Followers: {user.followers}</span>
-			<span>Following: {user.following}</span>
+			<span>
+				Followers:{" "}
+				<Link to="/$username/followers" params={{ username: user.username }}>
+					{user.followers}
+				</Link>
+			</span>
+			<span>
+				Following:{" "}
+				<Link to="/$username/following" params={{ username: user.username }}>
+					{user.following}
+				</Link>
+			</span>
 			<span>Joined: {new Date(user.created_at).toLocaleDateString()}</span>
 
 			<div

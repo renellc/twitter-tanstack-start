@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsernameRouteImport } from './routes/$username'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UsernameFollowingRouteImport } from './routes/$username.following'
+import { Route as UsernameFollowersRouteImport } from './routes/$username.followers'
 import { Route as UsernameStatusTweetIdRouteImport } from './routes/$username.status.$tweetId'
 
 const UsernameRoute = UsernameRouteImport.update({
@@ -23,6 +25,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsernameFollowingRoute = UsernameFollowingRouteImport.update({
+  id: '/following',
+  path: '/following',
+  getParentRoute: () => UsernameRoute,
+} as any)
+const UsernameFollowersRoute = UsernameFollowersRouteImport.update({
+  id: '/followers',
+  path: '/followers',
+  getParentRoute: () => UsernameRoute,
+} as any)
 const UsernameStatusTweetIdRoute = UsernameStatusTweetIdRouteImport.update({
   id: '/status/$tweetId',
   path: '/status/$tweetId',
@@ -32,25 +44,47 @@ const UsernameStatusTweetIdRoute = UsernameStatusTweetIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteWithChildren
+  '/$username/followers': typeof UsernameFollowersRoute
+  '/$username/following': typeof UsernameFollowingRoute
   '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteWithChildren
+  '/$username/followers': typeof UsernameFollowersRoute
+  '/$username/following': typeof UsernameFollowingRoute
   '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$username': typeof UsernameRouteWithChildren
+  '/$username/followers': typeof UsernameFollowersRoute
+  '/$username/following': typeof UsernameFollowingRoute
   '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$username' | '/$username/status/$tweetId'
+  fullPaths:
+    | '/'
+    | '/$username'
+    | '/$username/followers'
+    | '/$username/following'
+    | '/$username/status/$tweetId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$username' | '/$username/status/$tweetId'
-  id: '__root__' | '/' | '/$username' | '/$username/status/$tweetId'
+  to:
+    | '/'
+    | '/$username'
+    | '/$username/followers'
+    | '/$username/following'
+    | '/$username/status/$tweetId'
+  id:
+    | '__root__'
+    | '/'
+    | '/$username'
+    | '/$username/followers'
+    | '/$username/following'
+    | '/$username/status/$tweetId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -74,6 +108,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$username/following': {
+      id: '/$username/following'
+      path: '/following'
+      fullPath: '/$username/following'
+      preLoaderRoute: typeof UsernameFollowingRouteImport
+      parentRoute: typeof UsernameRoute
+    }
+    '/$username/followers': {
+      id: '/$username/followers'
+      path: '/followers'
+      fullPath: '/$username/followers'
+      preLoaderRoute: typeof UsernameFollowersRouteImport
+      parentRoute: typeof UsernameRoute
+    }
     '/$username/status/$tweetId': {
       id: '/$username/status/$tweetId'
       path: '/status/$tweetId'
@@ -85,10 +133,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface UsernameRouteChildren {
+  UsernameFollowersRoute: typeof UsernameFollowersRoute
+  UsernameFollowingRoute: typeof UsernameFollowingRoute
   UsernameStatusTweetIdRoute: typeof UsernameStatusTweetIdRoute
 }
 
 const UsernameRouteChildren: UsernameRouteChildren = {
+  UsernameFollowersRoute: UsernameFollowersRoute,
+  UsernameFollowingRoute: UsernameFollowingRoute,
   UsernameStatusTweetIdRoute: UsernameStatusTweetIdRoute,
 }
 

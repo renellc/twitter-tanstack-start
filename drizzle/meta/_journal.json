@@ -15,6 +15,13 @@
       "when": 1759392498207,
       "tag": "0001_milky_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759436418000,
+      "tag": "0002_fair_beast",
+      "breakpoints": true
     }
   ]
 }

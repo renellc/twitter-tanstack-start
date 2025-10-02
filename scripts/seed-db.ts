@@ -8,6 +8,7 @@ const main = async () => {
 
 	const numUsers = 1000;
 	const numTweets = 10000;
+	const _numFollowers = 10000;
 
 	console.log("Initial seeding...");
 	await seed(db, schema).refine((f) => ({
@@ -38,6 +39,79 @@ const main = async () => {
 		},
 	}));
 	console.log("Initial seeding ok!");
+
+	console.log("Seeding follower/following count for users...");
+	const users = await db.query.userTable.findMany();
+
+	const userFollowingTableValuesChunks: {
+		user_id: number;
+		following_user_id: number;
+	}[][] = [];
+
+	let userFollowingTableValues: {
+		user_id: number;
+		following_user_id: number;
+	}[] = [];
+
+	for (const user of users) {
+		const shouldHaveFollowers = Math.random() >= 0.5;
+
+		if (!shouldHaveFollowers) {
+			continue;
+		}
+
+		const followingMap = new Set<number>();
+
+		const numFollowers = Math.floor(Math.random() * numUsers) + 1;
+
+		for (let i = 0; i < numFollowers; i++) {
+			const followingUserId: number = Math.floor(Math.random() * numUsers) + 1;
+
+			if (followingMap.has(followingUserId) || followingUserId === user.id) {
+				continue;
+			}
+
+			followingMap.add(followingUserId);
+
+			userFollowingTableValues.push({
+				user_id: user.id,
+				following_user_id: followingUserId,
+			});
+
+			if (userFollowingTableValues.length === 1000) {
+				userFollowingTableValuesChunks.push(userFollowingTableValues);
+				userFollowingTableValues = [];
+			}
+		}
+	}
+
+	if (userFollowingTableValues.length !== 0) {
+		userFollowingTableValuesChunks.push(userFollowingTableValues);
+	}
+
+	for (const chunk of userFollowingTableValuesChunks) {
+		await db
+			.insert(schema.userFollowingTable)
+			.values(chunk)
+			.onConflictDoNothing();
+	}
+
+	// Update following/followers count after everything has been inserted
+	for (const user of users) {
+		const following = await db.query.userFollowingTable.findMany({
+			where: (table, f) => f.eq(table.user_id, user.id),
+		});
+
+		const followers = await db.query.userFollowingTable.findMany({
+			where: (table, f) => f.eq(table.following_user_id, user.id),
+		});
+
+		await db
+			.update(schema.userTable)
+			.set({ followers: followers.length, following: following.length })
+			.where(eq(schema.userTable.id, user.id));
+	}
+	console.log("Seeding followers for users ok!");
 
 	// Fix tweet values for likes, replies, retweets, bookmarks, etc.
 	// TODO: have these values be consistent based on some seed number (current is just random)
