@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsernameRouteImport } from './routes/$username'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UsernameStatusTweetIdRouteImport } from './routes/$username.status.$tweetId'
 
 const UsernameRoute = UsernameRouteImport.update({
   id: '/$username',
@@ -22,31 +23,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsernameStatusTweetIdRoute = UsernameStatusTweetIdRouteImport.update({
+  id: '/status/$tweetId',
+  path: '/status/$tweetId',
+  getParentRoute: () => UsernameRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$username': typeof UsernameRoute
+  '/$username': typeof UsernameRouteWithChildren
+  '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$username': typeof UsernameRoute
+  '/$username': typeof UsernameRouteWithChildren
+  '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$username': typeof UsernameRoute
+  '/$username': typeof UsernameRouteWithChildren
+  '/$username/status/$tweetId': typeof UsernameStatusTweetIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$username'
+  fullPaths: '/' | '/$username' | '/$username/status/$tweetId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$username'
-  id: '__root__' | '/' | '/$username'
+  to: '/' | '/$username' | '/$username/status/$tweetId'
+  id: '__root__' | '/' | '/$username' | '/$username/status/$tweetId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  UsernameRoute: typeof UsernameRoute
+  UsernameRoute: typeof UsernameRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +74,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$username/status/$tweetId': {
+      id: '/$username/status/$tweetId'
+      path: '/status/$tweetId'
+      fullPath: '/$username/status/$tweetId'
+      preLoaderRoute: typeof UsernameStatusTweetIdRouteImport
+      parentRoute: typeof UsernameRoute
+    }
   }
 }
 
+interface UsernameRouteChildren {
+  UsernameStatusTweetIdRoute: typeof UsernameStatusTweetIdRoute
+}
+
+const UsernameRouteChildren: UsernameRouteChildren = {
+  UsernameStatusTweetIdRoute: UsernameStatusTweetIdRoute,
+}
+
+const UsernameRouteWithChildren = UsernameRoute._addFileChildren(
+  UsernameRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  UsernameRoute: UsernameRoute,
+  UsernameRoute: UsernameRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

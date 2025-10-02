@@ -1,4 +1,10 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	notFound,
+	Outlet,
+	useMatches,
+} from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import * as z from "zod";
 import { db } from "../lib/db";
@@ -21,6 +27,11 @@ const getUser = createServerFn({ method: "GET" })
 				id: false,
 				password: false,
 			},
+			with: {
+				tweets: {
+					orderBy: (tweetTable, f) => [f.desc(tweetTable.created_at)],
+				},
+			},
 		});
 
 		if (!user) {
@@ -42,6 +53,15 @@ function ErrorComponent() {
 
 function RouteComponent() {
 	const user = Route.useLoaderData();
+	const matches = useMatches();
+
+	const isChildRoute =
+		matches.length > 0 &&
+		matches[matches.length - 1].fullPath !== Route.fullPath;
+
+	if (isChildRoute) {
+		return <Outlet />;
+	}
 
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -50,6 +70,36 @@ function RouteComponent() {
 			<span>Followers: {user.followers}</span>
 			<span>Following: {user.following}</span>
 			<span>Joined: {new Date(user.created_at).toLocaleDateString()}</span>
+
+			<div
+				style={{ display: "flex", flexDirection: "column", marginTop: "8px" }}
+			>
+				<span>Tweets</span>
+
+				<ul>
+					{user.tweets.map((tweet) => (
+						<li key={tweet.id}>
+							<Link
+								to="/$username/status/$tweetId"
+								params={{
+									username: user.username,
+									tweetId: tweet.id.toString(),
+								}}
+							>
+								<p>{tweet.content}</p>
+							</Link>
+
+							<ul>
+								<li>{new Date(tweet.created_at).toLocaleDateString()}</li>
+								<li>Likes: {tweet.likes}</li>
+								<li>Replies: {tweet.replies}</li>
+								<li>Retweets: {tweet.retweets}</li>
+								<li>Bookmarks: {tweet.bookmarks}</li>
+							</ul>
+						</li>
+					))}
+				</ul>
+			</div>
 		</div>
 	);
 }
