@@ -19,12 +19,12 @@ function RouteComponent() {
 	const users = Route.useLoaderData();
 
 	return (
-		<div style={{ display: "flex", flexDirection: "column" }}>
-			<span style={{ marginBottom: "8px" }}>Home Page</span>
+		<div className="flex flex-col">
+			<span className="mb-2">Home Page</span>
 
 			<span>Users:</span>
 
-			<ul style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+			<ul>
 				{users.map((user) => (
 					<li key={user.id}>
 						<Link to="/$username" params={{ username: user.username }}>

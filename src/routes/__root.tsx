@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+import appCss from "../styles/app.css?url";
+
 import {
 	createRootRoute,
 	HeadContent,
@@ -22,6 +24,7 @@ export const Route = createRootRoute({
 				title: "TanStack Start Starter",
 			},
 		],
+		links: [{ rel: "stylesheet", href: appCss }],
 	}),
 	component: RootComponent,
 });
