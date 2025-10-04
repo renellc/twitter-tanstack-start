@@ -1,11 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import {
-	HomeFeedTabs,
-	HomeFeedTabsContent,
-	HomeFeedTabsList,
-	HomeFeedTabsTrigger,
-} from "../component/HomeFeedTabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../component/Tabs";
 import { TweetCardList } from "../component/TweetCard";
 import { db } from "../lib/db";
 
@@ -38,18 +33,18 @@ function RouteComponent() {
 
 	return (
 		<div className="flex flex-col">
-			<HomeFeedTabs defaultValue="for-you">
-				<HomeFeedTabsList className="border border-b-[#39444D] border-t-0 border-x-0">
-					<HomeFeedTabsTrigger value="for-you">
+			<Tabs defaultValue="for-you">
+				<TabsList className="border border-b-[#39444D] border-t-0 border-x-0">
+					<TabsTrigger value="for-you">
 						<span>For You</span>
-					</HomeFeedTabsTrigger>
+					</TabsTrigger>
 
-					<HomeFeedTabsTrigger value="following">
+					<TabsTrigger value="following">
 						<span>Following</span>
-					</HomeFeedTabsTrigger>
-				</HomeFeedTabsList>
+					</TabsTrigger>
+				</TabsList>
 
-				<HomeFeedTabsContent value="for-you">
+				<TabsContent value="for-you">
 					<TweetCardList
 						tweets={forYouTweets.map((tweet) => ({
 							id: tweet.id.toString(),
@@ -60,12 +55,10 @@ function RouteComponent() {
 							retweets: tweet.retweets,
 						}))}
 					/>
-				</HomeFeedTabsContent>
+				</TabsContent>
 
-				<HomeFeedTabsContent value="following">
-					Following Feed
-				</HomeFeedTabsContent>
-			</HomeFeedTabs>
+				<TabsContent value="following">Following Feed</TabsContent>
+			</Tabs>
 		</div>
 	);
 }
