@@ -1,38 +1,35 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { db } from "../lib/db";
-
-const getUsers = createServerFn({ method: "GET" }).handler(async () => {
-	const users = await db.query.userTable.findMany({
-		columns: { id: true, username: true },
-	});
-
-	return users;
-});
+import { createFileRoute } from "@tanstack/react-router";
+import {
+	HomeFeedTabs,
+	HomeFeedTabsContent,
+	HomeFeedTabsList,
+	HomeFeedTabsTrigger,
+} from "../component/HomeFeedTabs";
 
 export const Route = createFileRoute("/")({
-	loader: () => getUsers(),
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const users = Route.useLoaderData();
-
 	return (
 		<div className="flex flex-col">
-			<span className="mb-2">Home Page</span>
+			<HomeFeedTabs defaultValue="for-you">
+				<HomeFeedTabsList className="border border-b-[#39444D] border-t-0 border-x-0">
+					<HomeFeedTabsTrigger value="for-you">
+						<span>For You</span>
+					</HomeFeedTabsTrigger>
 
-			<span>Users:</span>
+					<HomeFeedTabsTrigger value="following">
+						<span>Following</span>
+					</HomeFeedTabsTrigger>
+				</HomeFeedTabsList>
 
-			<ul>
-				{users.map((user) => (
-					<li key={user.id}>
-						<Link to="/$username" params={{ username: user.username }}>
-							{user.username}
-						</Link>
-					</li>
-				))}
-			</ul>
+				<HomeFeedTabsContent value="for-you">For You Feed</HomeFeedTabsContent>
+
+				<HomeFeedTabsContent value="following">
+					Following Feed
+				</HomeFeedTabsContent>
+			</HomeFeedTabs>
 		</div>
 	);
 }

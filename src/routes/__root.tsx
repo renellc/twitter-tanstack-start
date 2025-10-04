@@ -1,14 +1,9 @@
 /// <reference types="vite/client" />
 
-import appCss from "../styles/app.css?url";
-
-import {
-	createRootRoute,
-	HeadContent,
-	Outlet,
-	Scripts,
-} from "@tanstack/react-router";
+import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { AppLayout } from "../layout/AppLayout";
+import appCss from "../styles/app.css?url";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -32,14 +27,14 @@ export const Route = createRootRoute({
 function RootComponent() {
 	return (
 		<RootDocument>
-			<Outlet />
+			<AppLayout />
 		</RootDocument>
 	);
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 	return (
-		<html lang="en">
+		<html lang="en" style={{ overscrollBehavior: "none" }}>
 			<head>
 				<HeadContent />
 			</head>
