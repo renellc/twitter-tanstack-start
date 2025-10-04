@@ -1,7 +1,14 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import {
+	createFileRoute,
+	notFound,
+	useNavigate,
+	useRouter,
+} from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
+import { TweetCard, TweetCardList } from "../component/TweetCard";
 import { db } from "../lib/db";
 import { tweetTable, userTable } from "../lib/db/schema";
 
@@ -80,44 +87,50 @@ function NotFoundComponent() {
 
 function RouteComponent() {
 	const tweet = Route.useLoaderData();
+	const router = useRouter();
+	const navigate = useNavigate();
+
+	const onBack = async () => {
+		if (router.history.canGoBack()) {
+			router.history.back();
+		} else {
+			await navigate({ to: "/" });
+		}
+	};
 
 	return (
-		<div style={{ display: "flex", flexDirection: "column" }}>
-			<p>{tweet.content}</p>
+		<div className="flex flex-col px-4">
+			<div className="flex items-center py-3">
+				<ArrowLeftIcon
+					width="20"
+					height="20"
+					className="hover:cursor-pointer"
+					onClick={onBack}
+				/>
 
-			<ul>
-				<li>{new Date(tweet.created_at).toLocaleDateString()}</li>
-				<li>Likes: {tweet.likes}</li>
-				<li>Replies: {tweet.replies}</li>
-				<li>Retweets: {tweet.retweets}</li>
-				<li>Bookmarks: {tweet.bookmarks}</li>
-			</ul>
+				<span className="font-bold text-xl ml-8">Post</span>
+			</div>
 
-			<span>Replies:</span>
+			<TweetCard
+				tweet={{
+					username: tweet.owner,
+					content: tweet.content,
+					comments: tweet.replies,
+					likes: tweet.likes,
+					retweets: tweet.retweets,
+				}}
+			/>
 
-			{tweet.tweetReplies.length === 0 && <span>No replies</span>}
-
-			{tweet.tweetReplies.map((reply) => (
-				<li key={reply.id}>
-					<Link
-						to="/$username/status/$tweetId"
-						params={{
-							username: reply.user.username,
-							tweetId: reply.id.toString(),
-						}}
-					>
-						<p>{reply.content}</p>
-					</Link>
-
-					<ul>
-						<li>{new Date(reply.created_at).toLocaleDateString()}</li>
-						<li>Likes: {reply.likes}</li>
-						<li>Replies: {reply.replies}</li>
-						<li>Retweets: {reply.retweets}</li>
-						<li>Bookmarks: {reply.bookmarks}</li>
-					</ul>
-				</li>
-			))}
+			<TweetCardList
+				tweets={tweet.tweetReplies.map((reply) => ({
+					id: reply.id.toString(),
+					username: reply.user.username,
+					content: reply.content,
+					comments: reply.replies,
+					likes: reply.likes,
+					retweets: reply.retweets,
+				}))}
+			/>
 		</div>
 	);
 }
